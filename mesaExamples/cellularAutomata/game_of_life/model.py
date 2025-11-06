@@ -19,6 +19,7 @@ class ConwaysGameOfLife(Model):
             ( 1, -1), ( 1, 0), ( 1, 1),
         ]
         """
+        # Toroide activado para conectar todas los lados del grid
         self.grid = OrthogonalMooreGrid((width, height), capacity=1, torus=True)
 
         # Place a cell at each location, with some initialized to
