@@ -15,8 +15,8 @@ def agent_portrayal(agent):
 
 def post_process(ax):
     ax.set_aspect("equal")
-    ax.set_xticks([])
-    ax.set_yticks([])
+    # ax.set_xticks([])
+    # ax.set_yticks([])
 
 model_params = {
     "seed": {

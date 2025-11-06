@@ -40,17 +40,63 @@ class Cell(FixedAgent):
         """
         # Get the neighbors and apply the rules on whether to be alive or dead
         # at the next tick.
-        live_neighbors = sum(neighbor.is_alive for neighbor in self.neighbors)
 
-        # Assume nextState is unchanged, unless changed below.
-        self._next_state = self.state
+        # Se crean variables que corresponden a las posiciones de los vecinos de
+        # arriba de la celda actual, por lo que unicamente se consideran 3
+        # vecinos para la simulacion. Sa va a utilizar modulo para respetar el
+        # toroide
 
-        if self.is_alive:
-            if live_neighbors < 2 or live_neighbors > 3:
-                self._next_state = self.DEAD
-        else:
-            if live_neighbors == 3:
-                self._next_state = self.ALIVE
+        width = self.model.grid.width
+        height = self.model.grid.height
+
+        left_pos = ((self.x-1) % width, (self.y+1) % height)
+        center_pos = ((self.x) % width, (self.y+1) % height)
+        right_pos = ((self.x+1) % width, (self.y+1) % height)
+
+        # Inicializacion de variables donde se guardaran los agentes que
+        # corresponen a los vecinos de arriba.
+        left_agent = None
+        center_agent = None
+        right_agent = None
+
+        # Ciclo donde se recorre la lista de 8 vecinos de la celula actual y se
+        # identifican a los vecinos de arriba a traves de la igualdad de
+        # posiciones (coordenadas) con las variables definidas previamente.
+        for neighbor in self.neighbors:
+            if (neighbor.y > self.y):
+                if neighbor.pos == left_pos:
+                    left_agent = neighbor
+                elif neighbor.pos == center_pos:
+                    center_agent = neighbor
+                elif neighbor.pos == right_pos:
+                    right_agent = neighbor
+
+        # Para mayor legibilidad, se realizan nuevas variables que corresponden
+        # a los 3 vecinos de arriba y evaluan que los agentes no sean None y que
+        # esten vivos.
+        left = 1 if (left_agent and left_agent.is_alive) else 0
+        center = 1 if (center_agent and center_agent.is_alive) else 0
+        right = 1 if (right_agent and right_agent.is_alive) else 0
+        
+        # Se aplican las siguientes reglas de estado de la celula con base en
+        # los estados de los vecinos.
+        if left == 1 and center == 1 and right == 1:
+            self._next_state = self.DEAD  # 111 -> 0
+        elif left == 1 and center == 1 and right == 0:
+            self._next_state = self.ALIVE  # 110 -> 1
+        elif left == 1 and center == 0 and right == 1:
+            self._next_state = self.DEAD  # 101 -> 0
+        elif left == 1 and center == 0 and right == 0:
+            self._next_state = self.ALIVE  # 100 -> 1
+        elif left == 0 and center == 1 and right == 1:
+            self._next_state = self.ALIVE  # 011 -> 1
+        elif left == 0 and center == 1 and right == 0:
+            self._next_state = self.DEAD  # 010 -> 0
+        elif left == 0 and center == 0 and right == 1:
+            self._next_state = self.ALIVE  # 001 -> 1
+        else:  # left == 0 and center == 0 and right == 0
+            self._next_state = self.DEAD  # 000 -> 0
+
 
     def assume_state(self):
         """Set the state to the new computed state -- computed in step()."""
