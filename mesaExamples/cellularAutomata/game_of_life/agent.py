@@ -44,7 +44,15 @@ class Cell(FixedAgent):
         # Se crean variables que corresponden a las posiciones de los vecinos de
         # arriba de la celda actual, por lo que unicamente se consideran 3
         # vecinos para la simulacion. Sa va a utilizar modulo para respetar el
-        # toroide
+        # toroide a traves de un wrapping. Ex:
+
+        # Datos: 
+        # Height=50 Width=50
+        # self.pos = (5, 49)
+
+        # left_pos = ((5 - 1) % 50, (49 + 1) % 50) = (4, 0)
+        # center_pos = (5 % 50, 0) = (5, 0)
+        # right_pos = ((5 + 1) % 50, 0) = (6, 0)
 
         width = self.model.grid.width
         height = self.model.grid.height
@@ -63,13 +71,12 @@ class Cell(FixedAgent):
         # identifican a los vecinos de arriba a traves de la igualdad de
         # posiciones (coordenadas) con las variables definidas previamente.
         for neighbor in self.neighbors:
-            if (neighbor.y > self.y):
-                if neighbor.pos == left_pos:
-                    left_agent = neighbor
-                elif neighbor.pos == center_pos:
-                    center_agent = neighbor
-                elif neighbor.pos == right_pos:
-                    right_agent = neighbor
+            if neighbor.pos == left_pos:
+                left_agent = neighbor
+            elif neighbor.pos == center_pos:
+                center_agent = neighbor
+            elif neighbor.pos == right_pos:
+                right_agent = neighbor
 
         # Para mayor legibilidad, se realizan nuevas variables que corresponden
         # a los 3 vecinos de arriba y evaluan que los agentes no sean None y que

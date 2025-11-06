@@ -15,6 +15,8 @@ def agent_portrayal(agent):
 
 def post_process(ax):
     ax.set_aspect("equal")
+
+    # Se desactivan los ejes vacios para ver las dimensiones del grid
     # ax.set_xticks([])
     # ax.set_yticks([])
 
