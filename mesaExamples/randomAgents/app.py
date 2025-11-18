@@ -1,4 +1,4 @@
-from random_agents.agent import RandomAgent, ObstacleAgent
+from random_agents.agent import RandomAgent, ObstacleAgent, FloorAgent, StationAgent
 from random_agents.model import RandomModel
 
 from mesa.visualization import (
@@ -24,6 +24,15 @@ def random_portrayal(agent):
         portrayal.color = "gray"
         portrayal.marker = "s"
         portrayal.size = 100
+    elif isinstance(agent, FloorAgent):
+        portrayal.color = "brown"
+        portrayal.marker = "^"
+        portrayal.size = 10
+    elif isinstance(agent, StationAgent):
+        portrayal.color = "blue"
+        portrayal.marker = "s"
+        portrayal.size = 10
+        # portrayal.edgecolors = "black"
 
     return portrayal
 
@@ -39,6 +48,9 @@ model_params = {
     "num_agents": Slider("Number of agents", 10, 1, 50),
     "width": Slider("Grid width", 28, 1, 50),
     "height": Slider("Grid height", 28, 1, 50),
+    "num_obstacles": Slider("Number of obstacles", 15, 1, 50),
+    "num_dirty_tiles": Slider("Number of dirty tiles", 20, 1, 50),
+    # "num_stations": Slider("Number of energy stations", 20, 1, 50),
 }
 
 # Create the model using the initial parameters from the settings
