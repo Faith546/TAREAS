@@ -5,6 +5,7 @@ from mesa.visualization import (
     Slider,
     SolaraViz,
     make_space_component,
+    make_plot_component,
 )
 
 from mesa.visualization.components import AgentPortrayalStyle
@@ -39,6 +40,10 @@ def random_portrayal(agent):
 def post_process(ax):
     ax.set_aspect("equal")
 
+def post_process_lines(ax):
+    """Format the line plot"""
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.9))
+
 model_params = {
     "seed": {
         "type": "InputText",
@@ -50,7 +55,7 @@ model_params = {
     "height": Slider("Grid height", 28, 1, 50),
     "num_obstacles": Slider("Number of obstacles", 15, 1, 50),
     "num_dirty_tiles": Slider("Number of dirty tiles", 20, 1, 50),
-    # "num_stations": Slider("Number of energy stations", 20, 1, 50),
+    "max_steps": Slider("Maximum number of steps", 100, 1, 500)
 }
 
 # Create the model using the initial parameters from the settings
@@ -67,9 +72,17 @@ space_component = make_space_component(
         post_process=post_process
 )
 
+# Graphic component for plotting clean percentage
+lineplot_component = make_plot_component(
+    {
+        "Clean_Percentage": "yellow",
+    },
+    post_process=post_process_lines,
+)
+
 page = SolaraViz(
     model,
-    components=[space_component],
+    components=[space_component, lineplot_component],
     model_params=model_params,
     name="Random Model",
 )
