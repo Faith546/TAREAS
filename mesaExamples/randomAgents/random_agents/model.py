@@ -24,18 +24,23 @@ class RandomModel(mesa.Model):
         self.height = height
         self.max_steps = max_steps
         self.current_step = current_step
+        self.initial_dirty_tiles = num_dirty_tiles
+
         
 
         self.grid = OrthogonalMooreGrid([width, height], torus=False)
 
-        # ============= DATA COLLECTOR (OPTIMIZADO) =============
         self.datacollector = DataCollector(
             model_reporters={
-                "Clean_Percentage": lambda m: self._get_clean_percentage(m),
+                "clean_percentage": lambda m: self._get_clean_percentage(m),
+                "num_agents": lambda m: len([agent for agent in m.agents if isinstance(agent, RandomAgent)]),
+                "average_energy": lambda m: self._get_average_energy(m),
+                "average_movements": lambda m: self._get_average_movements(m)
             },
             agent_reporters={
                 "Movements": "movements",
                 "Score": "score",
+                "Energy": "energy"
             }
         )
 
@@ -52,20 +57,22 @@ class RandomModel(mesa.Model):
 
         agent_cells = self.random.choices(self.grid.empties.cells, k=self.num_agents)
 
-        RandomAgent.create_agents(
-            self,
-            self.num_agents,
-            cell=agent_cells,
-        )
 
-        for cell in agent_cells:
-            StationAgent(self, cell=cell)
+        if self.num_agents == 1:
+            specific_cell = self.grid[(1,1)]
+            StationAgent(self, cell= specific_cell)
+            RandomAgent(self, cell= specific_cell)
+        else:
+            RandomAgent.create_agents(
+                self,
+                self.num_agents,
+                cell=agent_cells,
+            )
 
-        # specific_cell = self.grid[(1,1)]
+            for cell in agent_cells:
+                StationAgent(self, cell=cell)
 
-        # StationAgent(self, cell= specific_cell)
 
-        # RandomAgent(self, cell= specific_cell)
 
         FloorAgent.create_agents(
             self,
@@ -81,7 +88,7 @@ class RandomModel(mesa.Model):
 
         self.running = True
         
-        # Recopilar datos iniciales
+        # Retrieve initial data
         self.datacollector.collect(self)
 
     def step(self):
@@ -106,18 +113,21 @@ class RandomModel(mesa.Model):
 
         self.current_step += 1
     
-    # ============= HELPER METHODS =============
+    # Helpers
     
     def _get_clean_percentage(self, model):
-        """Calculate the percentage of clean tiles in the grid."""
-        dirty_count = 0
-        total_count = 0
-        for agent in model.agents:
-            if isinstance(agent, FloorAgent):
-                total_count += 1
-                if not agent.fully_clean:
-                    dirty_count += 1
-        
-        if total_count == 0:
-            return 100
-        return ((total_count - dirty_count) / total_count) * 100
+        dirty_count = sum(1 for a in model.agents if isinstance(a, FloorAgent) and not a.fully_clean)
+        return ((self.initial_dirty_tiles - dirty_count) / self.initial_dirty_tiles) * 100
+    
+    def _get_average_energy(self, model):
+        agents = [agent for agent in model.agents if isinstance(agent, RandomAgent)]
+        if not agents:
+            return 0
+        return sum(agent.energy for agent in agents) / len(agents)
+    
+    def _get_average_movements(self, model):
+        """Calcula el promedio de movimientos de los RandomAgents"""
+        agents = [agent for agent in model.agents if isinstance(agent, RandomAgent)]
+        if not agents:
+            return 0
+        return sum(agent.movements for agent in agents) / len(agents)
