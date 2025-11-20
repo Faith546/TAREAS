@@ -86,13 +86,13 @@ class RandomAgent(CellAgent):
     self.discover_stations()
   
   def discover_stations(self):
-    """Discover and share charging station locations with other agents."""
+    """Discover and share charging station locations with other agents in his neighborhood."""
     for neighbor_cell in self.cell.neighborhood:
       if any(isinstance(obj, StationAgent) for obj in neighbor_cell.agents):
         self.share_station_location(neighbor_cell)
-        for agent in self.model.agents:
-          if isinstance(agent, RandomAgent) and agent != self:
-            agent.share_station_location(neighbor_cell)
+        for nearby_agent in self.cell.neighborhood.agents:
+          if isinstance(nearby_agent, RandomAgent) and nearby_agent != self:
+            nearby_agent.share_station_location(neighbor_cell)
   
   def get_empty_neighbors(self):
     """Get neighboring cells without obstacles or other agents."""
