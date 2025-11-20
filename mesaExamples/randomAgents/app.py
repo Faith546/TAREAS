@@ -51,8 +51,8 @@ model_params = {
         "label": "Random Seed",
     },
     "num_agents": Slider("Number of agents", 10, 1, 50),
-    "width": Slider("Grid width", 28, 1, 50),
-    "height": Slider("Grid height", 28, 1, 50),
+    "width": Slider("Grid width", 20, 1, 50),
+    "height": Slider("Grid height", 20, 1, 50),
     "num_obstacles": Slider("Number of obstacles", 15, 1, 50),
     "num_dirty_tiles": Slider("Number of dirty tiles", 20, 1, 50),
     "max_steps": Slider("Maximum number of steps", 100, 1, 500)
@@ -75,7 +75,10 @@ space_component = make_space_component(
 # Graphic component for plotting clean percentage
 lineplot_component = make_plot_component(
     {
-        "Clean_Percentage": "yellow",
+        "clean_percentage": "orange",
+        "num_agents": "blue",
+        "average_energy": "green",
+        "average_movements": "purple"
     },
     post_process=post_process_lines,
 )
