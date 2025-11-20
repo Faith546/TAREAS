@@ -50,22 +50,27 @@ class RandomAgent(CellAgent):
   
   def determine_next_state(self):
     """Determine next state based on current situation and priorities."""
+    # Priority 1: Charging if on station and not full energy
     is_on_station = any(isinstance(obj, StationAgent) for obj in self.cell.agents)
     if is_on_station and self.energy < 100:
       return STATE_CHARGING
 
+    # Priority 2: Critical battery - seek charger
     if self.energy < 25:
       if self.last_position_before_charging is None:
         self.last_position_before_charging = self.cell
       return STATE_SEEKING_CHARGER
 
-    is_on_dirty_tile = any(isinstance(obj, FloorAgent) and not obj.fully_clean for obj in self.cell.agents)
-    if is_on_dirty_tile:
+    # Priority 3: Clean if on dirty tile (check before wandering)
+    floor_tile = next((obj for obj in self.cell.agents if isinstance(obj, FloorAgent)), None)
+    if floor_tile and not floor_tile.fully_clean:
       return STATE_CLEANING
 
+    # Priority 4: Travel to exploration target
     if self.exploration_target is not None:
       return STATE_TRAVELING
 
+    # Priority 5: Wander
     return STATE_WANDERING
 
   def execute_state_action(self):
@@ -119,9 +124,9 @@ class RandomAgent(CellAgent):
     """Clean the dirty floor tile at current position."""
     floor_tile = next((obj for obj in self.cell.agents if isinstance(obj, FloorAgent)), None)
     if floor_tile and not floor_tile.fully_clean:
-      self.discharge()
       floor_tile.fully_clean = True
       self.score += 1
+      self.discharge()
       self.movements += 1
 
   def move_to_station(self):
