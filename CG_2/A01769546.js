@@ -1,5 +1,7 @@
     /*
-    * Building Generator - Generador de edificios cilíndricos en formato OBJ
+    * Diego Flores Becerril A01769546
+    *
+    * Generador de edificios cilíndricos en formato OBJ
     * 
     * Crea edificios con forma de cilindro truncado con parámetros personalizables:
     * - Número de lados (3-36)
@@ -7,11 +9,11 @@
     * - Radio en la base (flotante positivo)
     * - Radio en la cima (flotante positivo)
     * 
-    * CG_2 - TC2008B
-    * 2025-11-23
+    * 
+    * 2025-11-24
     */
 
-    import { V3 } from './3d-lib';
+    import { V3 } from './3d-lib.js';
 
     function generateBuilding(sides = 8, height = 6.0, baseRadius = 1.0, topRadius = 0.8) {
     if (sides < 3 || sides > 36) {
